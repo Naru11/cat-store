@@ -14,4 +14,5 @@ import homeProduct from './components/HomeProduct.vue'
     <HomeNew />
     <HomeHot />
     <homeProduct />
+    
 </template>
