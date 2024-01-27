@@ -4,16 +4,19 @@ import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { getBannerAPI } from "@/apis/home"
 import GoodsItem from '../Home/components/GoodsItem.vue';
+import {onBeforeRouteUpdate} from 'vue-router'
 
 const CategoryData = ref({})
 const route = useRoute()
 
-const getCategory = async () => {
-    const res = await getCategoryAPI(route.params.id)
+const getCategory = async (id=route.params.id) => {
+    const res = await getCategoryAPI(id)
     CategoryData.value = res.result
 }
 
 onMounted(() => { getCategory() })
+
+onBeforeRouteUpdate((to)=>{getCategory(to.params.id)})
 
 const BannerList = ref([])
 
@@ -46,7 +49,7 @@ onMounted(() => getBannerList())
                 <h3>全部分类</h3>
                 <ul>
                     <li v-for="i in CategoryData.children" :key="i.id">
-                        <RouterLink to="/">
+                        <RouterLink :to="`/category/sub/${i.id}`">
                             <img :src="i.picture" />
                             <p>{{ i.name }}</p>
                         </RouterLink>
