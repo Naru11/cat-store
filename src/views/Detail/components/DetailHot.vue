@@ -1,5 +1,5 @@
 <script setup>
-import {getDetailHotAPI} from '@/apis/detail'
+import { getDetailHotAPI } from '@/apis/detail'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
