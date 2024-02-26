@@ -3,18 +3,44 @@ import { getGoodsAPI } from '@/apis/detail';
 import DetailHot from './components/DetailHot.vue'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-
+import { ElMessage } from 'element-plus';
+import { useCartStore } from '@/stores/cartStore'
+const cartStore=useCartStore()
 const Goods = ref({})
 const route = useRoute()
 
-const getGoods =  async (id) => {
+const getGoods = async (id) => {
     const res = await getGoodsAPI(id)
-    Goods.value=res.result
+    Goods.value = res.result
 }
 onMounted(() => { getGoods(route.params.id) })
 
+let skuObj={}
 const skuChange = (sku) => {
-    console.log(sku)
+    skuObj=sku
+}
+
+const count = ref(1)
+const countChange = (count) => {
+    console.log(count)
+}
+
+const addCart = () => {
+    if (skuObj.skuId) {
+        cartStore.addCart({
+            id: Goods.value.id,
+            name: Goods.value.name,
+            picture: Goods.value.mainPictures[0],
+            price: Goods.value.price,
+            count: count.value,
+            skuId: skuObj.skuId,
+            attrsText: skuObj.specsText,
+            selected:true
+        })
+    }
+    else {
+        ElMessage.warning('请选择规格')
+    }
 }
 </script>
 
@@ -26,7 +52,8 @@ const skuChange = (sku) => {
                     <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
                     <el-breadcrumb-item :to="{ path: `/category/${Goods.categories[1].id}` }">{{ Goods.categories[1].name }}
                     </el-breadcrumb-item>
-                    <el-breadcrumb-item :to="{ path: `/category/sub/${Goods.categories[0].id}` }">{{ Goods.categories[0].name }}
+                    <el-breadcrumb-item :to="{ path: `/category/sub/${Goods.categories[0].id}` }">{{
+                        Goods.categories[0].name }}
                     </el-breadcrumb-item>
                     <el-breadcrumb-item>{{ Goods.name }}</el-breadcrumb-item>
                 </el-breadcrumb>
@@ -37,12 +64,12 @@ const skuChange = (sku) => {
                     <div class="goods-info">
                         <div class="media">
                             <!-- 图片预览区 -->
-                            <ImageView :imageList="Goods.mainPictures"/>
+                            <ImageView :imageList="Goods.mainPictures" />
                             <!-- 统计数量 -->
                             <ul class="goods-sales">
                                 <li>
                                     <p>销量人气</p>
-                                    <p> {{Goods.salesCount}} </p>
+                                    <p> {{ Goods.salesCount }} </p>
                                     <p><i class="iconfont icon-task-filling"></i>销量人气</p>
                                 </li>
                                 <li>
@@ -52,23 +79,23 @@ const skuChange = (sku) => {
                                 </li>
                                 <li>
                                     <p>收藏人气</p>
-                                    <p>{{Goods.collectCount}}</p>
+                                    <p>{{ Goods.collectCount }}</p>
                                     <p><i class="iconfont icon-favorite-filling"></i>收藏商品</p>
                                 </li>
                                 <li>
                                     <p>品牌信息</p>
-                                    <p>{{Goods.brand.name}}</p>
+                                    <p>{{ Goods.brand.name }}</p>
                                     <p><i class="iconfont icon-dynamic-filling"></i>品牌主页</p>
                                 </li>
                             </ul>
                         </div>
                         <div class="spec">
                             <!-- 商品信息区 -->
-                            <p class="g-name"> {{Goods.name}} </p>
-                            <p class="g-desc">{{Goods.desc}} </p>
+                            <p class="g-name"> {{ Goods.name }} </p>
+                            <p class="g-desc">{{ Goods.desc }} </p>
                             <p class="g-price">
-                                <span>{{Goods.oldPrice}}</span>
-                                <span> {{Goods.price}}</span>
+                                <span>{{ Goods.oldPrice }}</span>
+                                <span> {{ Goods.price }}</span>
                             </p>
                             <div class="g-service">
                                 <dl>
@@ -86,12 +113,12 @@ const skuChange = (sku) => {
                                 </dl>
                             </div>
                             <!-- sku组件 -->
-                            <sku :goods="Goods" @change="skuChange"/>
+                            <sku :goods="Goods" @change="skuChange" />
                             <!-- 数据组件 -->
-
+                            <el-input-number v-model="count" @change="countChange" />
                             <!-- 按钮组件 -->
                             <div>
-                                <el-button size="large" class="btn">
+                                <el-button size="large" class="btn" @click="addCart">
                                     加入购物车
                                 </el-button>
                             </div>
@@ -109,8 +136,8 @@ const skuChange = (sku) => {
                                     <!-- 属性 -->
                                     <ul class="attrs">
                                         <li v-for="item in Goods.details.properties" :key="item.value">
-                                            <span class="dt">{{item.name}}</span>
-                                            <span class="dd">{{item.value}}</span>
+                                            <span class="dt">{{ item.name }}</span>
+                                            <span class="dd">{{ item.value }}</span>
                                         </li>
                                     </ul>
                                     <!-- 图片 -->
@@ -120,8 +147,8 @@ const skuChange = (sku) => {
                         </div>
                         <!-- 24热榜+专题推荐 -->
                         <div class="goods-aside">
-                            <DetailHot :hotType="1"/>
-                            <DetailHot :hotType="2"/>
+                            <DetailHot :hotType="1" />
+                            <DetailHot :hotType="2" />
                         </div>
                     </div>
                 </div>
@@ -333,7 +360,8 @@ const skuChange = (sku) => {
 
 .goods-detail {
     padding: 40px;
-    margin:0 auto;
+    margin: 0 auto;
+
     .attrs {
         display: flex;
         flex-wrap: wrap;
