@@ -7,7 +7,6 @@ const newList = ref([]);
 const getNewList = async () => {
     const  res = await getNewAPI();
     newList.value = res.result;
-    console.log(newList,res.result)
 
 }
 

@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-import { loginAPI } from '@/apis/user'
 import { ElMessage } from 'element-plus'
 import {useRouter} from 'vue-router'
 import 'element-plus/theme-chalk/el-message.css'
@@ -41,7 +40,7 @@ const doLogin = () => {
     const {account,password}=form.value
     formRef.value.validate(async(valid) => {
         if (valid) {
-            userStore.getUserInfo({account,password})
+            await userStore.getUserInfo({account,password})
             ElMessage({ type: 'success', message: '登录成功' })
             router.replace({ path: '/' })
         }
