@@ -3,6 +3,7 @@ import { loginAPI } from '@/apis/user'
 import { defineStore } from 'pinia';
 import { useCartStore } from './cartStore'
 import {mergeCartAPI} from '@/apis/cart'
+import httpInstance from '@/utils/http';
 export const useUserStore = defineStore('user', () => {
     const userInfo = ref({})
     const cartStore=useCartStore()
@@ -33,3 +34,13 @@ export const useUserStore = defineStore('user', () => {
     persist: true,
     },)
   
+
+
+export const getLikeListAPI = ({ limit = 4 }) => {
+  return httpInstance({
+    url:'/goods/relevant',
+    params: {
+      limit 
+    }
+  })
+}
